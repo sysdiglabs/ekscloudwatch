@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ekscloudwatch-config
+  namespace: sysdig-agent
+data:
+  # Required: Endpoint to forward audit events to, such as Sysdig Secure agent
+  # The agent must expose a k8s audit server (k8s_audit_server_port must be configured in the agent as well)
+  endpoint: "http://agent:7765/k8s_audit"
+
+  # Required: Cloudwatch polling interval
+  cw_polling: "5m"
+
+  # Required: CloudWatch query filter
+  cw_filter: '{ $.sourceIPs[0] != "::1" && $.sourceIPs[0] != "127.0.0.1" }'
+
+  # Optional: the EKS cluster name
+  # This can be omitted if the EC2 instance can perform the ec2:DescribeInstances action
+  cluster_name: ""

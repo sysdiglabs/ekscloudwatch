@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eks-cloudwatch
+  namespace: sysdig-agent
+spec:
+  minReadySeconds: 5
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eks-cloudwatch
+  template:
+    metadata:
+      labels:
+        app: eks-cloudwatch
+    spec:
+      containers:
+        - image: sysdiglabs/k8sauditlogforwarder:ekscloudwatch-0.1
+          imagePullPolicy: Always
+          name: eks-cloudwatch-container
+          env:
+            - name: ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: ekscloudwatch-config
+                  key: endpoint
+            - name: CLUSTER_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: ekscloudwatch-config
+                  key: cluster_name
+            - name: CW_POLLING
+              valueFrom:
+                configMapKeyRef:
+                  name: ekscloudwatch-config
+                  key: cw_polling
+            - name: CW_FILTER
+              valueFrom:
+                configMapKeyRef:
+                  name: ekscloudwatch-config
+                  key: cw_filter

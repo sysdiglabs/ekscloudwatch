@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent
+  namespace: sysdig-agent
+spec:
+  type: ClusterIP
+  ports:
+  - name: audit
+    port: 7765
+    protocol: TCP
+    targetPort: 7765
+  selector:
+    app: sysdig-agent
+
