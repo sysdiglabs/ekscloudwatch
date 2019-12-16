@@ -1,60 +1,43 @@
-# EKS audit integration installation
+# EKS audit integration example
 
-## Prerequisites
+The following instructions show how to deploy a simple application that reads EKS Kubernetes audit logs and forwards them to the Sysdig Secure agent.
+The steps below show an example configuration implemented with the AWS console, but the same can be done with scripts, API calls or Infrastructure-as-Code configurations.
 
-In order to install the EKS integration you need an AWS EKS cluster which is currently monitored by Sysdig Secure.
-The cluster needs to have the k8s audit service enabled, i.e. this must be present in your `dragent.yaml`:
-
-```
-    security:
-      enabled: true
-      k8s_audit_server_url: 0.0.0.0
-      k8s_audit_server_port: 7765
-    commandlines_capture:
-      enabled: true
-    memdump:
-      enabled: true
-```
-
-In addition, the audit server must be exposed as a service:
-
-```
-apiVersion: v1
-kind: Service
-metadata:
-  name: agent
-  namespace: sysdig-agent
-spec:
-  type: ClusterIP
-  ports:
-  - name: audit
-    port: 7765
-    protocol: TCP
-    targetPort: 7765
-  selector:
-    app: sysdig-agent
-```
+These instructions have been tested with eks.5 on Kubernetes v1.14.
 
 ## EKS setup: enable CloudWatch audit logs
 
-Your EKS cluster must be configured to forward audit logs to CloudWatch.
-In order to do this from the AWS dashboard select your cluster > Logging > Update > Audit enabled
+Your EKS cluster needs be configured to forward audit logs to CloudWatch, which is disabled by default.
+
+1. Open the EKS dashboard from the AWS console
+1. Select your cluster > _Logging_ > _Update_ and enable _Audit_
 
 ![Audit Enabled](readme_img/audit_logs.png)
 
 ## EKS setup: configure the VPC endpoint
 
-Your VPC must have an endpoint for the service `com.amazonaws.<your-region>.logs`, accessible from all the EKS security groups.
-For example, in order to configure it from the AWS dashboard, go to VPCs, select Endpoints > Create Endpoints > Find service by name > `com.amazonaws.<your-region>.logs`. Under VPC select your VPC, and under security groups select all.
+Your VPC needs an endpoint for the service `com.amazonaws.<your-region>.logs`, accessible from all the EKS security groups.
+
+1. Open the VPC dashboard from the AWS console
+1. Select _Endpoints_ > _Create Endpoints_
+1. Select _Find service by name_, enter `com.amazonaws.<your-region>.logs` and click "Verify".
+1. Under VPC select your cluster's VPC
+1. Select all security groups
 
 ## EKS setup: configure EC2 instance profiles and roles
 
 The EC2 instances that make up your EKS cluster must have the necessary permission to read CW logs. Usually they all use the same IAM Role, so that is the one to configure.
-From the AWS EC2 dashboard select the interface, go to its associated IAM Role and Attach the policy *CloudWatchLogsReadOnlyAccess*.
+
+1. Open the EC2 dashboard from the AWS console
+1. Select the AWS EC2 instances that are configured as cluster nodes
+1. Select the associated IAM Role, which should be the same for all nodes
+1. Find the policy `CloudWatchReadOnlyAccess` and attach it
 
 ![Permissions](readme_img/attach_permissions.png)
 
 ## Deploy the client and its configmap
+
+We can now deploy the log forwarder itself along with its configmap.
 
 ```
 $ kubectl --namespace sysdig-agent apply -f ./ekscloudwatch-config.yaml
@@ -62,3 +45,7 @@ configmap/ekscloudwatch-config created
 $ kubectl --namespace sysdig-agent apply -f ./deployment.yaml
 deployment.apps/eks-cloudwatch created
 ```
+
+To check if the forwarder is configured and working correctly you can check the logs for the pod that you just deployed in the `sysdig-agent` namespace. 
+
+You should see k8s audit related events in the Sysdig Secure dashboard.
