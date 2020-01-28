@@ -6,7 +6,7 @@ metadata:
 data:
   # Required: Endpoint to forward audit events to, such as Sysdig Secure agent
   # The agent must expose a k8s audit server (k8s_audit_server_port must be configured in the agent as well)
-  endpoint: "http://sysdig-agent:8765/k8s_audit"
+  endpoint: "http://sysdig-agent:7765/k8s_audit"
 
   # Required: Cloudwatch polling interval
   cw_polling: "5m"
