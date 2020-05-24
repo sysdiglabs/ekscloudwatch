@@ -12,6 +12,10 @@ FROM alpine
 COPY --from=build /app/ekscloudwatch /ekscloudwatch
 
 # Needed to connect to the CW Logs endpoint
-RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
+RUN apk --no-cache update && \
+    apk add ca-certificates && \
+    adduser -D 1000 && \
+    chmod +x /ekscloudwatch
 
+USER 1000
 CMD ["/ekscloudwatch"]
