@@ -1,6 +1,6 @@
 FROM golang:1.13-buster as build
 
-RUN apt update && apt install apt ca-certificates && \
+RUN apt-get update && apt-get install apt ca-certificates && \
     useradd -u 1000 ekscloudwatch
 
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 COPY go.mod ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o ekscloudwatch github.com/sysdiglabs/ekscloudwatch/cmd && \
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o /app/ekscloudwatch github.com/sysdiglabs/ekscloudwatch/cmd && \
     chmod +x /app/ekscloudwatch
 
 FROM scratch
