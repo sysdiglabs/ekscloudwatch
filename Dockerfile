@@ -1,6 +1,6 @@
 FROM golang:1.13-buster as build
 
-RUN apt-get update && apt-get install apt ca-certificates && \
+RUN apt-get update && apt-get install apt ca-certificates -y && \
     useradd -u 1000 ekscloudwatch
 
 WORKDIR /app
