@@ -15,7 +15,7 @@ spec:
         app: eks-cloudwatch
     spec:
       containers:
-        - image: sysdiglabs/k8sauditlogforwarder:ekscloudwatch-0.1
+        - image: sysdiglabs/k8sauditlogforwarder:ekscloudwatch-0.2
           imagePullPolicy: Always
           name: eks-cloudwatch-container
           env:
