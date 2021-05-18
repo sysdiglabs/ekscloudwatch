@@ -14,6 +14,7 @@ data:
   # Required: CloudWatch query filter
   cw_filter: '{ $.sourceIPs[0] != "::1" && $.sourceIPs[0] != "127.0.0.1" }'
 
-  # Optional: the EKS cluster name
-  # This can be omitted if the EC2 instance can perform the ec2:DescribeInstances action
+  # Optional: both the EKS cluster name and region must be set
+  # This can be omitted if the EC2 instance can perform the ec2metadata and ec2:DescribeInstances action
   cluster_name: ""
+  aws_region: ""

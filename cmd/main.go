@@ -10,8 +10,9 @@ import (
 
 func main() {
 	log.Printf("Cloudwatch EKS log started")
-	clusterNameOverride := os.Getenv("CLUSTER_NAME")
 	endpoint := os.Getenv("ENDPOINT")
+	clusterNameOverride := os.Getenv("CLUSTER_NAME")
+	awsRegionOverride := os.Getenv("AWS_REGION")
 
 	if endpoint == "" {
 		log.Fatalf("Agent endpoint not specified or configmap not found.")
