@@ -15,7 +15,7 @@ spec:
         app: eks-cloudwatch
     spec:
       containers:
-        - image: sysdiglabs/k8sauditlogforwarder:ekscloudwatch-0.2
+        - image: sysdiglabs/k8sauditlogforwarder:ekscloudwatch-dev
           imagePullPolicy: Always
           name: eks-cloudwatch-container
           env:
@@ -29,6 +29,11 @@ spec:
                 configMapKeyRef:
                   name: ekscloudwatch-config
                   key: cluster_name
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: ekscloudwatch-config
+                  key: aws_region
             - name: CW_POLLING
               valueFrom:
                 configMapKeyRef:

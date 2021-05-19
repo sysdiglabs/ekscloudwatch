@@ -9,9 +9,11 @@ import (
 )
 
 func main() {
+	log.Printf("Release 0.3")
 	log.Printf("Cloudwatch EKS log started")
-	clusterNameOverride := os.Getenv("CLUSTER_NAME")
 	endpoint := os.Getenv("ENDPOINT")
+	clusterNameOverride := os.Getenv("CLUSTER_NAME")
+	awsRegionOverride := os.Getenv("AWS_REGION")
 
 	if endpoint == "" {
 		log.Fatalf("Agent endpoint not specified or configmap not found.")
@@ -24,7 +26,7 @@ func main() {
 
 	filter := os.Getenv("CW_FILTER")
 
-	eks, err := ekscloudwatch.New(endpoint, clusterNameOverride, pollingDuration)
+	eks, err := ekscloudwatch.New(endpoint, clusterNameOverride, awsRegionOverride, pollingDuration)
 	if err != nil {
 		log.Fatalf("Could not initialize EKS CloudWatch client: %s", err)
 	}
