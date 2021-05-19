@@ -33,7 +33,7 @@ func New(k8sAuditURI string, clusterNameOverride string, awsRegionOverride strin
 	var region string
 	// if awsRegionOverride isn't set use it, otherwise try to autodetect it from the instance
 	if awsRegionOverride != "" {
-    region = awsRegionOverride
+    		region = awsRegionOverride
 	} else {
 		region, err = metaClient.Region()
 		if err != nil {
