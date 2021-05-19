@@ -24,23 +24,24 @@ type EKSAuditLogs struct {
 
 // New creates a new instance of the CW client that periodically polls cloudwatch and sends events to the specified
 // Sysdig agent URI
-func New(k8sAuditURI string, clusterNameOverride string, pollingInterval time.Duration) (*EKSAuditLogs, error) {
+func New(k8sAuditURI string, clusterNameOverride string, awsRegionOverride string, pollingInterval time.Duration) (*EKSAuditLogs, error) {
 	metaSession := session.Must(session.NewSession())
 	metaClient := ec2metadata.New(metaSession)
-	region, err := metaClient.Region()
-	if err != nil {
-		log.Printf("Could not get region from EC2 metadata.")
-		log.Printf("Sysdig EKS CloudWatch agent can only be run inside an EC2 instance and EC2 instance metadata must be available.")
-		return nil, err
-	}
 
-	instanceIdentity, err := metaClient.GetInstanceIdentityDocument()
-	if err != nil {
-		log.Printf("Could not get EC2 instance information.")
-		return nil, err
-	}
+	var err error
 
-	log.Printf("AWS Instance ID: %s", instanceIdentity.InstanceID)
+	var region string
+	// if awsRegionOverride isn't set use it, otherwise try to autodetect it from the instance
+	if awsRegionOverride != "" {
+    		region = awsRegionOverride
+	} else {
+		region, err = metaClient.Region()
+		if err != nil {
+			log.Printf("Could not get region from EC2 metadata.")
+			log.Printf("Sysdig EKS CloudWatch agent can only be run inside an EC2 instance and EC2 instance metadata should be available.")
+			return nil, err
+		}
+	}
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		Config: aws.Config{
@@ -49,11 +50,16 @@ func New(k8sAuditURI string, clusterNameOverride string, pollingInterval time.Du
 	}))
 
 	var clusterName string
-
 	// if clusterNameOverride isn't set use it, otherwise try to autodetect it from the instance
 	if clusterNameOverride != "" {
 		clusterName = clusterNameOverride
 	} else {
+		instanceIdentity, err := metaClient.GetInstanceIdentityDocument()
+		if err != nil {
+			log.Printf("Could not get EC2 instance information.")
+			return nil, err
+		}
+
 		ec2client := ec2.New(sess)
 		diOut, err := ec2client.DescribeInstances(&ec2.DescribeInstancesInput{
 			InstanceIds: []*string{aws.String(instanceIdentity.InstanceID)},

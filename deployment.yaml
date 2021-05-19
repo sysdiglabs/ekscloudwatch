@@ -29,6 +29,11 @@ spec:
                 configMapKeyRef:
                   name: ekscloudwatch-config
                   key: cluster_name
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: ekscloudwatch-config
+                  key: aws_region
             - name: CW_POLLING
               valueFrom:
                 configMapKeyRef:
