@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	log.Printf("Release 0.3")
+	log.Printf("Release 0.4")
 	log.Printf("Cloudwatch EKS log started")
 	endpoint := os.Getenv("ENDPOINT")
 	clusterNameOverride := os.Getenv("CLUSTER_NAME")
